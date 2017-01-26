@@ -1,9 +1,19 @@
 package org.qcri.rheem.basic.operators;
 
+import org.apache.commons.lang3.StringUtils;
 import org.qcri.rheem.basic.data.Record;
 import org.qcri.rheem.basic.types.RecordType;
+import org.qcri.rheem.core.api.exception.RheemException;
 import org.qcri.rheem.core.plan.rheemplan.UnarySource;
 import org.qcri.rheem.core.types.DataSetType;
+import org.qcri.rheem.core.util.fs.FileSystem;
+import org.qcri.rheem.core.util.fs.FileSystems;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Stream;
 
 /**
  * {@link UnarySource} that provides the tuples from a database table.
@@ -50,7 +60,27 @@ public abstract class TableSource extends UnarySource<Record> {
     }
 
 
-   public String getInputUrl() {
+    public static String[] getColumnNames(String url){
+        String myHeader = null;
+        FileSystem fs = FileSystems.getFileSystem(url).orElseThrow(
+                () -> new RheemException(String.format("Cannot access file system of %s.", url))
+        );
+
+        try {
+            final InputStream inputStream = fs.open(url);
+            Stream<String> lines = new BufferedReader(new InputStreamReader(inputStream)).lines();
+            myHeader = lines.findFirst().get();
+        } catch (IOException e) {
+            throw new RheemException(String.format("Reading %s failed.", url), e);
+        }
+
+        String columnNames[] = StringUtils.split(myHeader,delimiter);
+
+        return columnNames;
+    }
+
+
+    public String getInputUrl() {
         return tableName; // in case of csv files we assume file name is the full path of a csv file
     }
 

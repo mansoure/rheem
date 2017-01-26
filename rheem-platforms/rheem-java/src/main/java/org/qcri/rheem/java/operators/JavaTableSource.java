@@ -58,6 +58,7 @@ public class JavaTableSource extends TableSource implements JavaExecutionOperato
         super(that);
     }
 
+    /*
     private static String[] getColumnNames(String url){
         String myHeader = null;
         FileSystem fs = FileSystems.getFileSystem(url).orElseThrow(
@@ -76,7 +77,7 @@ public class JavaTableSource extends TableSource implements JavaExecutionOperato
 
        return columnNames;
     }
-
+    //*/
 
 
 
@@ -124,8 +125,8 @@ public class JavaTableSource extends TableSource implements JavaExecutionOperato
     }
 
     @Override
-    public JavaTextFileSource copy() {
-        return new JavaTextFileSource(this.getInputUrl());
+    public JavaTableSource copy() {
+        return new JavaTableSource(this.getInputUrl());
     }
 
     @Override
