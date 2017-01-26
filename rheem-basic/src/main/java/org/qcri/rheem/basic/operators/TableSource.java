@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 /**
  * {@link UnarySource} that provides the tuples from a database table.
  */
-public abstract class TableSource extends UnarySource<Record> {
+public class TableSource extends UnarySource<Record> {
 
     private final String tableName;
     protected static String delimiter = ",";
