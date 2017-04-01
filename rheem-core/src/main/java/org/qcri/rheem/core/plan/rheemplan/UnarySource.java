@@ -6,6 +6,7 @@ import org.qcri.rheem.core.types.DataSetType;
  * Abstract base class for sources with a single output.
  */
 public abstract class UnarySource<T> extends OperatorBase implements ElementaryOperator {
+    public UnarySource() {super();};
 
     /**
      * Creates a new instance that does not support broadcast {@link InputSlot}s.

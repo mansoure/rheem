@@ -15,7 +15,7 @@
         <module>rheem-java</module>
         <module>rheem-spark</module>
         <module>rheem-postgres</module>
-        <module>rheem-graphchi</module>
+        <!--<module>rheem-graphchi</module>-->
         <module>rheem-jdbc-template</module>
         <module>rheem-sqlite3</module>
     </modules>

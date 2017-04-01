@@ -23,6 +23,7 @@ public class TableSource extends UnarySource<Record> {
     private final String tableName;
     protected static String delimiter = ",";
 
+    public TableSource(){tableName="";};
 
     public String getTableName() {
         return tableName;
@@ -38,6 +39,11 @@ public class TableSource extends UnarySource<Record> {
     public TableSource(String tableName, String... colNames) {
         this(tableName, createOutputDataSetType(colNames));
         delimiter = ",";
+    }
+
+    public TableSource(String tableName, String deli) {
+        this(tableName,getColumnNames(tableName));
+        delimiter = deli;
     }
 
     public TableSource(String tableName,String d, String... colNames)  {

@@ -18,6 +18,7 @@ import java.util.function.Supplier;
  * Helper class for the implementation of the {@link Operator} interface.
  */
 public abstract class OperatorBase implements Operator {
+    public OperatorBase() {isSupportingBroadcastInputs =false;outputSlots=null;};
 
     public static final List<Tuple<Class<?>, Supplier<?>>> STANDARD_OPERATOR_ARGS = Arrays.asList(
             new Tuple<>(DataSetType.class, DataSetType::none),

@@ -1,6 +1,7 @@
 package org.qcri.rheem.java.operators;
 
-import org.apache.commons.lang3.StringUtils;
+import com.opencsv.CSVReader;
+
 import org.qcri.rheem.basic.operators.TableSource;
 import org.qcri.rheem.core.api.exception.RheemException;
 import org.qcri.rheem.core.optimizer.OptimizationContext;
@@ -18,14 +19,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import org.qcri.rheem.basic.data.Record;
-import org.qcri.rheem.basic.types.RecordType;
+
 
 /**
  * This is execution operator implements the {@link TableSource}.
@@ -97,21 +95,61 @@ public class JavaTableSource extends TableSource implements JavaExecutionOperato
         );
 
         try {
+
+
+//            final InputStream inputStream = fs.open(url);
+//            Stream<String> lines = new BufferedReader(new InputStreamReader(inputStream)).lines();
+//            Stream<Record> records = lines.skip(1).map(r -> new Record(r.split(delimiter))); // skip the header line
+//            ((StreamChannel.Instance) outputs[0]).accept(records);
+
             final InputStream inputStream = fs.open(url);
-            Stream<String> lines = new BufferedReader(new InputStreamReader(inputStream)).lines();
-            Stream<Record> records = lines.skip(1).map(r -> new Record(r.split(delimiter))); // skip the header line
-            ((StreamChannel.Instance) outputs[0]).accept(records);
+            CSVReader reader;
+            reader = new CSVReader(new InputStreamReader(inputStream));
+            System.out.println(">>>> JavaTableSource CSVReader ..initilized");
+//           List<String []> lines = reader.readAll();
+            List<String []> lines = new ArrayList<String[]>();
+
+            int i = 0;
+            int No_falseCases=0;
+            boolean mycase = reader.iterator().hasNext();
+
+            int count = 0;
+            while (mycase && i <= 100000)
+            {
+
+//              System.out.println("Next1: " + reader.iterator().hasNext());
+                String [] r = reader.iterator().next();
+                ++count;
+                if(r != null)
+                    lines.add(r);
+                else {
+                    System.out.println(count);
+//                    lines.add(r);
+                    No_falseCases++;
+                   System.out.println("Next2: " + mycase);
+                    //break;
+                }
+                i++;
+                mycase = reader.iterator().hasNext();
+            }
+
+            System.out.println(">>>> JavaTableSource CSVReader ..readAll, No_falseCases is " +No_falseCases);
+            System.out.println(">>>> JavaTableSource get no of record .. " + lines.size());
+            Stream<Record> records = lines.subList(1,lines.size()).stream().map(r -> new Record(r)); // skip the header line
+                    ((StreamChannel.Instance) outputs[0]).accept(records);
+            System.out.println(">>>> JavaTableSource get record ..done");
+
         } catch (IOException e) {
             throw new RheemException(String.format("Reading %s failed.", url), e);
         }
 
         ExecutionLineageNode prepareLineageNode = new ExecutionLineageNode(operatorContext);
         prepareLineageNode.add(LoadProfileEstimators.createFromSpecification(
-                "rheem.java.textfilesource.load.prepare", javaExecutor.getConfiguration()
+                "rheem.java.tablesource.load.prepare", javaExecutor.getConfiguration()
         ));
         ExecutionLineageNode mainLineageNode = new ExecutionLineageNode(operatorContext);
         mainLineageNode.add(LoadProfileEstimators.createFromSpecification(
-                "rheem.java.textfilesource.load.main", javaExecutor.getConfiguration()
+                "rheem.java.tablesource.load.main", javaExecutor.getConfiguration()
         ));
 
         outputs[0].getLineage().addPredecessor(mainLineageNode);
@@ -121,7 +159,7 @@ public class JavaTableSource extends TableSource implements JavaExecutionOperato
 
     @Override
     public Collection<String> getLoadProfileEstimatorConfigurationKeys() {
-        return Arrays.asList("rheem.java.textfilesource.load.prepare", "rheem.java.textfilesource.load.main");
+        return Arrays.asList("rheem.java.tablesource.load.prepare", "rheem.java.tablesource.load.main");
     }
 
     @Override

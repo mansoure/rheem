@@ -12,6 +12,7 @@ import java.util.Collection;
 public class Mappings {
 
     public static Collection<Mapping> BASIC_MAPPINGS = Arrays.asList(
+            new TableSourceMapping(),
             new TextFileSourceMapping(),
             new TextFileSinkMapping(),
             new MapMapping(),
